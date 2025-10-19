@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Meet: Interactive Investment Memorandum</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Harmony -->
+    <!-- Application Structure Plan: A top-down, narrative-driven dashboard. The structure guides investors from the high-level opportunity to the granular, interactive financial model. It starts with the 'Why' (the product), moves to the 'How' (revenue streams), and culminates in the 'What If' (interactive financial simulator). This flow is more persuasive than a static report, allowing investors to 'own' the projections by manipulating the variables themselves, fostering confidence and engagement. Navigation is included for non-linear exploration. -->
+    <!-- Visualization & Content Choices: 
+        - Subscription Tiers: Report Info -> Subscription plan details. Goal -> Organize/Compare. Viz -> Interactive HTML cards. Interaction -> Click to highlight. Justification -> Allows easy comparison of plan values. Method -> HTML/CSS/JS.
+        - Revenue Model: Report Info -> Revenue sources. Goal -> Inform/Proportions. Viz -> Donut Chart. Interaction -> Updates from simulator. Justification -> Instantly shows the primary income driver (subscriptions). Method -> Chart.js.
+        - Financial Projections: Report Info -> Costs & revenue logic. Goal -> Explore Relationships/Project. Viz -> Interactive sliders & Bar Chart. Interaction -> User-controlled sliders recalculate all financials and update charts in real-time. Justification -> Transforms passive data consumption into an active analysis tool, which is highly compelling for investors. Method -> HTML/JS/Chart.js.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFCFB;
+            color: #1a1a1a;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .plan-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .plan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .plan-card.selected {
+            transform: translateY(-5px);
+            box-shadow: 0 0 0 3px #D946EF;
+            border-color: #D946EF;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #D946EF;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #D946EF;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 border-b border-gray-200">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-800">
+                <span class="text-fuchsia-500">♥</span> Love Meet
+            </h1>
+            <div class="hidden md:flex space-x-8">
+                <a href="#opportunity" class="text-gray-600 hover:text-fuchsia-500 transition">The Opportunity</a>
+                <a href="#revenue" class="text-gray-600 hover:text-fuchsia-500 transition">Revenue Model</a>
+                <a href="#financials" class="text-gray-600 hover:text-fuchsia-500 transition">Financial Simulator</a>
+                <a href="#investment" class="text-gray-600 hover:text-fuchsia-500 transition">Investment</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <section id="hero" class="text-center py-16">
+            <h2 class="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight">
+                Investing in the <span class="text-fuchsia-500">Future of Connection</span>
+            </h2>
+            <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
+                An interactive dashboard for potential investors in Love Meet, a next-generation social discovery platform by Highscoretech.
+            </p>
+            <p class="mt-2 text-sm text-gray-500">Presented by Valiant Joe, CEO</p>
+        </section>
+
+        <section id="opportunity" class="py-16">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold text-gray-800">The Opportunity</h3>
+                <p class="mt-2 text-gray-600">Love Meet is uniquely positioned in the market by merging the high-engagement loop of social media with the focused goal of a dating app. This hybrid model increases user retention and creates more opportunities for monetization. This section outlines our core value proposition and the key features that drive our platform's appeal.</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="bg-white p-6 rounded-xl border border-gray-200">
+                    <div class="text-3xl text-fuchsia-500 mb-3">💬</div>
+                    <h4 class="font-bold text-lg">Social Engagement</h4>
+                    <p class="text-gray-600 mt-1">Users post, like, and comment, creating a vibrant community that encourages daily activity and organic content creation.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-gray-200">
+                    <div class="text-3xl text-fuchsia-500 mb-3">🚀</div>
+                    <h4 class="font-bold text-lg">Tiered Connection System</h4>
+                    <p class="text-gray-600 mt-1">A seven-tier subscription model that creates value and scarcity, effectively driving users to upgrade for more access.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-gray-200">
+                    <div class="text-3xl text-fuchsia-500 mb-3">🎮</div>
+                    <h4 class="font-bold text-lg">Love Games</h4>
+                    <p class="text-gray-600 mt-1">Exclusive in-app games provide fun, low-pressure icebreakers, enhancing user experience and offering premium content sales.</p>
+                </div>
+                 <div class="bg-white p-6 rounded-xl border border-gray-200">
+                    <div class="text-3xl text-fuchsia-500 mb-3">🎁</div>
+                    <h4 class="font-bold text-lg">Gifting System</h4>
+                    <p class="text-gray-600 mt-1">An in-app economy where users can purchase and send virtual gifts, fostering interaction and creating a transactional revenue stream.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="revenue" class="py-16 bg-gray-50 -mx-6 px-6 rounded-2xl">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold text-gray-800">A Diversified Revenue Engine</h3>
+                 <p class="mt-2 text-gray-600 max-w-3xl mx-auto">Our monetization strategy is built on three pillars: recurring subscriptions, transactional commissions, and premium content sales. This approach maximizes user lifetime value (LTV). Explore our subscription plans below to see how we guide users up the value ladder.</p>
+            </div>
+            
+            <h4 class="text-2xl font-bold text-center mb-8">Subscription Plans</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-4 text-center">
+                 <!-- Subscription plans will be injected here by JS -->
+            </div>
+            <div id="plan-details" class="mt-8 bg-white p-6 rounded-lg border min-h-[160px] transition-all duration-300">
+                <!-- Details of selected plan will appear here -->
+            </div>
+        </section>
+        
+        <section id="financials" class="py-16">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold text-gray-800">Interactive Financial Simulator</h3>
+                <p class="mt-2 text-gray-600 max-w-3xl mx-auto">This is where the numbers come to life. Adjust the sliders below to model different growth scenarios and see the direct impact on revenue, costs, and profitability. The charts will update in real-time, providing a dynamic view of Love Meet's financial potential based on your own assumptions.</p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8 items-start">
+                <div class="lg:col-span-1 space-y-6 bg-white p-6 rounded-xl border border-gray-200">
+                    <h4 class="text-xl font-bold">Assumption Levers</h4>
+                    <div>
+                        <label for="active-subscribers" class="font-medium">Active Subscribers: <span id="active-subscribers-value" class="font-bold text-fuchsia-500">1000</span></label>
+                        <input type="range" id="active-subscribers" min="100" max="10000" step="100" value="1000" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                     <div>
+                        <label for="arpu" class="font-medium">Average Revenue Per User (ARPU): $<span id="arpu-value" class="font-bold text-fuchsia-500">5.00</span></label>
+                        <input type="range" id="arpu" min="1" max="20" step="0.5" value="5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div>
+                        <label for="gift-volume" class="font-medium">Annual Gift Volume: $<span id="gift-volume-value" class="font-bold text-fuchsia-500">5000</span></label>
+                        <input type="range" id="gift-volume" min="1000" max="50000" step="1000" value="5000" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                     <div>
+                        <label for="withdrawal-volume" class="font-medium">Annual Withdrawal Volume: $<span id="withdrawal-volume-value" class="font-bold text-fuchsia-500">10000</span></label>
+                        <input type="range" id="withdrawal-volume" min="1000" max="100000" step="1000" value="10000" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                     <div>
+                        <label for="game-purchases" class="font-medium">Monthly Game Purchases: <span id="game-purchases-value" class="font-bold text-fuchsia-500">200</span></label>
+                        <input type="range" id="game-purchases" min="0" max="2000" step="50" value="200" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-xl border border-gray-200">
+                        <h4 class="text-xl font-bold text-center mb-4">Annual Revenue Breakdown</h4>
+                        <div class="chart-container">
+                            <canvas id="revenueBreakdownChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-gray-200">
+                        <h4 class="text-xl font-bold text-center mb-4">Annual Revenue vs. Costs</h4>
+                        <div class="chart-container">
+                            <canvas id="revenueVsCostsChart"></canvas>
+                        </div>
+                    </div>
+                     <div class="md:col-span-2 bg-white p-6 rounded-xl border border-gray-200 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                        <div>
+                            <p class="text-sm text-gray-500">Total Annual Revenue</p>
+                            <p id="total-revenue" class="text-3xl font-bold text-green-600">$63,150</p>
+                        </div>
+                         <div>
+                            <p class="text-sm text-gray-500">Net Annual Profit</p>
+                            <p id="net-profit" class="text-3xl font-bold text-gray-800">$61,430</p>
+                        </div>
+                         <div>
+                            <p class="text-sm text-gray-500">Profit Margin</p>
+                            <p id="profit-margin" class="text-3xl font-bold text-fuchsia-500">97.3%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="investment" class="py-16">
+             <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold text-gray-800">The Investment Opportunity</h3>
+                <p class="mt-2 text-gray-600 max-w-3xl mx-auto">Highscoretech is seeking seed funding to accelerate user acquisition, enhance platform features, and scale our infrastructure. Our capital-efficient model and high-profit margins allow us to offer a compelling return to our early-stage investors. We believe in building strong partnerships to fuel our growth.</p>
+            </div>
+            <div class="max-w-2xl mx-auto bg-fuchsia-500 text-white p-8 rounded-2xl text-center shadow-2xl">
+                <h4 class="text-2xl font-bold">We are seeking $100,000 in seed funding.</h4>
+                <p class="mt-2 opacity-90">In exchange, we are offering a</p>
+                <p class="text-6xl font-extrabold my-4">70%</p>
+                <p class="text-2xl font-bold">Fixed Annual Return on Investment</p>
+                <div class="mt-6 text-sm bg-fuchsia-600/50 p-4 rounded-lg">
+                    <p>Example: A <span class="font-bold">$10,000</span> investment would be repaid as <span class="font-bold">$17,000</span> after 12 months.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="border-t border-gray-200">
+        <div class="container mx-auto px-6 py-8 text-center text-gray-600">
+            <p class="font-bold text-lg">Highscoretech</p>
+            <p>Valiant Joe, CEO</p>
+            <p class="mt-2 text-sm">This document is for informational purposes only and does not constitute an offer to sell securities.</p>
+            <p class="text-sm">&copy; 2025 Love Meet. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const subscriptionPlans = [
+                { name: 'Orbit', price: '1', features: ["2 Love Games", "1 post per day", "Message Orbit/Starlight users"] },
+                { name: 'Starlight', price: '2', features: ["3 Love Games", "2 posts per day", "Message Starlight/Nova users"] },
+                { name: 'Nova', price: '3', features: ['5 Love Games', '4 posts per day', 'Message Nova/Equinox users', 'See who likes you'], recommended: true },
+                { name: 'Equinox', price: '7', features: ['8 Love Games', '7 posts per day', 'Message Equinox/Polaris users', '5 Super Likes per week'] },
+                { name: 'Polaris', price: '13', features: ['13 Love Games', '12 posts per day', 'Message Polaris/Orion users', 'Travel Mode'] },
+                { name: 'Orion', price: '20', features: ['21 Love Games', '20 posts per day', 'Message Orion/Cosmos users', 'Priority Likes'] },
+                { name: 'Cosmos', price: '30', features: ['34 Love Games', '33 posts per day', 'Message Everyone', 'Profile review & feature'] },
+            ];
+
+            const plansContainer = document.querySelector('#revenue .grid');
+            const planDetailsContainer = document.getElementById('plan-details');
+
+            subscriptionPlans.forEach((plan, index) => {
+                const card = document.createElement('div');
+                card.className = `plan-card p-4 rounded-lg border-2 cursor-pointer bg-white ${plan.recommended ? 'border-fuchsia-500' : 'border-gray-200'}`;
+                card.innerHTML = `
+                    <p class="font-bold text-lg">${plan.name}</p>
+                    <p class="text-2xl font-extrabold text-gray-800">$${plan.price}</p>
+                    <p class="text-xs text-gray-500">/ month</p>
+                `;
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    
+                    let featuresHtml = `<h4 class="font-bold text-xl mb-2">${plan.name} Plan Features</h4><ul class="list-disc list-inside text-gray-600 space-y-1">`;
+                    plan.features.forEach(feature => {
+                        featuresHtml += `<li>${feature}</li>`;
+                    });
+                    featuresHtml += '</ul>';
+                    planDetailsContainer.innerHTML = featuresHtml;
+                });
+                plansContainer.appendChild(card);
+                if (plan.recommended) {
+                    card.click();
+                }
+            });
+
+            const operationalCosts = {
+                staffSalary: 57,
+                server: 15,
+                cloudinary: 13,
+                appStoreYearly: 100,
+                referralPayoutRate: 0.05,
+                giftCommission: 0.05,
+                withdrawalCommission: 0.05,
+                gamePrice: 1
+            };
+
+            const valueSpans = {
+                activeSubscribers: document.getElementById('active-subscribers-value'),
+                arpu: document.getElementById('arpu-value'),
+                giftVolume: document.getElementById('gift-volume-value'),
+                withdrawalVolume: document.getElementById('withdrawal-volume-value'),
+                gamePurchases: document.getElementById('game-purchases-value'),
+            };
+
+            const inputs = {
+                activeSubscribers: document.getElementById('active-subscribers'),
+                arpu: document.getElementById('arpu'),
+                giftVolume: document.getElementById('gift-volume'),
+                withdrawalVolume: document.getElementById('withdrawal-volume'),
+                gamePurchases: document.getElementById('game-purchases'),
+            };
+
+            const outputs = {
+                totalRevenue: document.getElementById('total-revenue'),
+                netProfit: document.getElementById('net-profit'),
+                profitMargin: document.getElementById('profit-margin'),
+            };
+            
+            let revenueBreakdownChart, revenueVsCostsChart;
+
+            const formatCurrency = (value) => {
+                return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
+            };
+
+            function createCharts() {
+                const breakdownCtx = document.getElementById('revenueBreakdownChart').getContext('2d');
+                revenueBreakdownChart = new Chart(breakdownCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Subscriptions', 'Games', 'Gift Commission', 'Withdrawal Commission'],
+                        datasets: [{
+                            data: [0, 0, 0, 0],
+                            backgroundColor: ['#D946EF', '#A21CAF', '#701A75', '#4A044E'],
+                            borderColor: '#FDFCFB',
+                            borderWidth: 4,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            },
+                        }
+                    }
+                });
+
+                const vsCtx = document.getElementById('revenueVsCostsChart').getContext('2d');
+                revenueVsCostsChart = new Chart(vsCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Financials'],
+                        datasets: [{
+                            label: 'Total Revenue',
+                            data: [0],
+                            backgroundColor: '#16A34A',
+                            borderRadius: 4,
+                        }, {
+                            label: 'Total Costs',
+                            data: [0],
+                            backgroundColor: '#DC2626',
+                             borderRadius: 4,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) { return '$' + value / 1000 + 'k'; }
+                                }
+                            }
+                        },
+                         plugins: {
+                            legend: {
+                                position: 'bottom',
+                            },
+                        }
+                    }
+                });
+            }
+
+            function updateFinancials() {
+                const subscribers = parseInt(inputs.activeSubscribers.value);
+                const arpu = parseFloat(inputs.arpu.value);
+                const giftVolume = parseInt(inputs.giftVolume.value);
+                const withdrawalVolume = parseInt(inputs.withdrawalVolume.value);
+                const gamePurchases = parseInt(inputs.gamePurchases.value);
+
+                valueSpans.activeSubscribers.textContent = subscribers.toLocaleString();
+                valueSpans.arpu.textContent = arpu.toFixed(2);
+                valueSpans.giftVolume.textContent = giftVolume.toLocaleString();
+                valueSpans.withdrawalVolume.textContent = withdrawalVolume.toLocaleString();
+                valueSpans.gamePurchases.textContent = gamePurchases.toLocaleString();
+
+                const subscriptionRevenue = subscribers * arpu * 12;
+                const gameRevenue = gamePurchases * operationalCosts.gamePrice * 12;
+                const giftCommissionRevenue = giftVolume * operationalCosts.giftCommission;
+                const withdrawalCommissionRevenue = withdrawalVolume * operationalCosts.withdrawalCommission;
+                
+                const totalRevenue = subscriptionRevenue + gameRevenue + giftCommissionRevenue + withdrawalCommissionRevenue;
+
+                const fixedMonthlyCosts = operationalCosts.staffSalary + operationalCosts.server + operationalCosts.cloudinary;
+                const fixedAnnualCosts = (fixedMonthlyCosts * 12) + operationalCosts.appStoreYearly;
+                const referralCosts = subscriptionRevenue * operationalCosts.referralPayoutRate; 
+                const totalCosts = fixedAnnualCosts + referralCosts;
+
+                const netProfit = totalRevenue - totalCosts;
+                const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
+                
+                outputs.totalRevenue.textContent = formatCurrency(totalRevenue);
+                outputs.netProfit.textContent = formatCurrency(netProfit);
+                outputs.profitMargin.textContent = profitMargin.toFixed(1) + '%';
+                
+                revenueBreakdownChart.data.datasets[0].data = [subscriptionRevenue, gameRevenue, giftCommissionRevenue, withdrawalCommissionRevenue];
+                revenueBreakdownChart.update();
+
+                revenueVsCostsChart.data.datasets[0].data[0] = totalRevenue;
+                revenueVsCostsChart.data.datasets[1].data[0] = totalCosts;
+                revenueVsCostsChart.update();
+            }
+
+            Object.values(inputs).forEach(input => {
+                input.addEventListener('input', updateFinancials);
+            });
+            
+            createCharts();
+            updateFinancials();
+        });
+    </script>
+</body>
+</html>

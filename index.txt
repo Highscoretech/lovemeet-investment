@@ -1,0 +1,17 @@
+error handling => 
+try=> continue
+catch=> log -> error
+
+async / await 
+Frontend ----> backend ----> Database
+
+
+GET -> asking for something || fetching something
+POST -> Sending out something to be created
+PUT -> Sending out somthing that needs to be updated
+DELETE -> asking to delete
+PATCH -> asking to update something or create somthing
+
+baseUrl => https://highscore.com
+pathUrl => /api/blog
+fetch(baseUrl + pathUrl)
